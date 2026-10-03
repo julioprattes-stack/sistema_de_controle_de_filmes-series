@@ -32,13 +32,13 @@ class WatchEntryListView(OwnEntriesMixin, ListView):
         if genre:
             queryset = queryset.filter(title__genres__id=genre)
         if search:
-            search = search.filter(title__name__icontains=search)
+            queryset = queryset.filter(title__name__icontains=search)
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["statuses"] = WatchEntryModel.Status.choices
-        context["kinds"] = TitleModel.Kind.choices
+        context["kinds"] = TitleModel.Type.choices
         context["genres"] = GenusModel.objects.order_by("name")
         return context
     
@@ -52,7 +52,7 @@ class WatchEntryCreateView(OwnEntriesMixin, CreateView):
         form.instance.user = self.request.user
         return super().form_valid(form)
 
-class WatchEntryUpadteView(OwnEntriesMixin, UpdateView):
+class WatchEntryUpdateView(OwnEntriesMixin, UpdateView):
     model = WatchEntryModel
     form_class = RegisterTrackingForm
     template_name = 'tracking/entry_form.html'
@@ -60,4 +60,5 @@ class WatchEntryUpadteView(OwnEntriesMixin, UpdateView):
 
 class WatchEntryDeleteView(OwnEntriesMixin, DeleteView):
     model = WatchEntryModel
+    template_name = "tracking/entry_confirm_delete.html"
     success_url = reverse_lazy("tracking:entry_list")

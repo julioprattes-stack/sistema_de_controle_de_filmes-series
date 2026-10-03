@@ -11,7 +11,7 @@ class TitleListView(ListView):
     context_object_name = 'titles'
     paginate_by = 10
 
-    def get(self):
+    def get_queryset(self):
         queryset = TitleModel.objects.prefetch_related('genres').order_by('name')
         search = self.request.GET.get('search')
         type = self.request.GET.get('type')

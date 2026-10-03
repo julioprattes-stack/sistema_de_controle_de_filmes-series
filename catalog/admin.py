@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import GenusModel, PlatformModel, TitleModel
 
-# Register your models here.
+admin.site.register(GenusModel)
+admin.site.register(PlatformModel)
+admin.site.register(TitleModel)
