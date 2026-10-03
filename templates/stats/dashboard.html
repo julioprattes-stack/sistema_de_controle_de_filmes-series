@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Estatísticas{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4">Estatísticas</h1>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card text-center"><div class="card-body">
+      <div class="display-6">{{ summary.done }}</div>
+      <div class="text-muted">Assistidos</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card text-center"><div class="card-body">
+      <div class="display-6">{{ summary.avg_rating|floatformat:1|default:"-" }}</div>
+      <div class="text-muted">Nota média</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card text-center"><div class="card-body">
+      <div class="display-6">{{ summary.watching }}</div>
+      <div class="text-muted">Assistindo</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card text-center"><div class="card-body">
+      <div class="display-6">{{ summary.planned }}</div>
+      <div class="text-muted">Quero ver</div>
+    </div></div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="card"><div class="card-body">
+      <h2 class="h6">Filmes x Séries</h2>
+      <canvas id="kindChart"></canvas>
+    </div></div>
+  </div>
+  <div class="col-md-8">
+    <div class="card"><div class="card-body">
+      <h2 class="h6">Assistidos por mês</h2>
+      <canvas id="monthChart"></canvas>
+    </div></div>
+  </div>
+  <div class="col-12">
+    <div class="card"><div class="card-body">
+      <h2 class="h6">Gêneros mais vistos</h2>
+      <canvas id="genreChart"></canvas>
+    </div></div>
+  </div>
+</div>
+
+{{ chart_data|json_script:"chart-data" }}
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+  const data = JSON.parse(document.getElementById("chart-data").textContent);
+
+  new Chart(document.getElementById("kindChart"), {
+    type: "doughnut",
+    data: {
+      labels: data.kind.labels,
+      datasets: [{ data: data.kind.values }],
+    },
+  });
+
+  new Chart(document.getElementById("monthChart"), {
+    type: "bar",
+    data: {
+      labels: data.month.labels,
+      datasets: [{ label: "Títulos", data: data.month.values }],
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+    },
+  });
+
+  new Chart(document.getElementById("genreChart"), {
+    type: "bar",
+    data: {
+      labels: data.genre.labels,
+      datasets: [{ label: "Títulos", data: data.genre.values }],
+    },
+    options: {
+      indexAxis: "y",
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            afterLabel: (ctx) => {
+              const nota = data.genre.ratings[ctx.dataIndex];
+              return nota !== null ? "Nota média: " + nota : "";
+            },
+          },
+        },
+      },
+      scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+    },
+  });
+</script>
+{% endblock %}

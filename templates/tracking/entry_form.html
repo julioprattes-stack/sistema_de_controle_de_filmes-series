@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{% if object %}Editar registro{% else %}Novo registro{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h1 class="h3 mb-3">
+      {% if object %}Editar: {{ object.title.name }}{% else %}Adicionar à minha lista{% endif %}
+    </h1>
+
+    <form method="post" class="bg-white p-4 border rounded">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-dark">Salvar</button>
+      <a href="{% url 'tracking:entry_list' %}" class="btn btn-outline-secondary">Cancelar</a>
+    </form>
+
+    {% if not object %}
+    <p class="mt-3 text-muted">
+      Não achou o título?
+      <a href="{% url 'catalog:title_create' %}">Cadastre no catálogo</a> primeiro.
+    </p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

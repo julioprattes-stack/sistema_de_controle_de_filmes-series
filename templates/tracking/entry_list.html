@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Minha lista{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Minha lista</h1>
+  <a href="{% url 'tracking:entry_create' %}" class="btn btn-dark">Adicionar</a>
+</div>
+
+<form method="get" class="row g-2 mb-4">
+  <div class="col-md-3">
+    <input type="text" name="q" class="form-control"
+           placeholder="Buscar título" value="{{ request.GET.q }}">
+  </div>
+  <div class="col-md-3">
+    <select name="status" class="form-select">
+      <option value="">Todos os status</option>
+      {% for value, label in statuses %}
+        <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>
+          {{ label }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <select name="kind" class="form-select">
+      <option value="">Filmes e séries</option>
+      {% for value, label in kinds %}
+        <option value="{{ value }}" {% if request.GET.kind == value %}selected{% endif %}>
+          {{ label }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <select name="genre" class="form-select">
+      <option value="">Todos os gêneros</option>
+      {% for genre in genres %}
+        <option value="{{ genre.id }}"
+                {% if request.GET.genre == genre.id|stringformat:"s" %}selected{% endif %}>
+          {{ genre.name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2 d-grid">
+    <button type="submit" class="btn btn-outline-dark">Filtrar</button>
+  </div>
+</form>
+
+<table class="table table-striped bg-white">
+  <thead>
+    <tr>
+      <th>Título</th>
+      <th>Tipo</th>
+      <th>Status</th>
+      <th>Nota</th>
+      <th>Progresso</th>
+      <th>Terminou em</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for entry in entries %}
+    <tr>
+      <td>{{ entry.title.name }}</td>
+      <td>{{ entry.title.get_kind_display }}</td>
+      <td>
+        {% if entry.status == "done" %}
+          <span class="badge text-bg-success">{{ entry.get_status_display }}</span>
+        {% elif entry.status == "watching" %}
+          <span class="badge text-bg-primary">{{ entry.get_status_display }}</span>
+        {% elif entry.status == "dropped" %}
+          <span class="badge text-bg-danger">{{ entry.get_status_display }}</span>
+        {% else %}
+          <span class="badge text-bg-secondary">{{ entry.get_status_display }}</span>
+        {% endif %}
+      </td>
+      <td>{{ entry.rating|default:"-" }}</td>
+      <td>
+        {% if entry.current_season %}
+          T{{ entry.current_season }} E{{ entry.current_episode|default:"?" }}
+        {% else %}-{% endif %}
+      </td>
+      <td>{{ entry.finished_on|date:"d/m/Y"|default:"-" }}</td>
+      <td class="text-end">
+        <a href="{% url 'tracking:entry_update' entry.pk %}"
+           class="btn btn-sm btn-outline-secondary">Editar</a>
+        <a href="{% url 'tracking:entry_delete' entry.pk %}"
+           class="btn btn-sm btn-outline-danger">Excluir</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="7" class="text-center text-muted">Nada por aqui ainda.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if is_paginated %}
+<nav>
+  <ul class="pagination">
+    {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link"
+           href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}&status={{ request.GET.status }}&kind={{ request.GET.kind }}&genre={{ request.GET.genre }}">Anterior</a>
+      </li>
+    {% endif %}
+    <li class="page-item disabled">
+      <span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    </li>
+    {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link"
+           href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}&status={{ request.GET.status }}&kind={{ request.GET.kind }}&genre={{ request.GET.genre }}">Próxima</a>
+      </li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{% if object %}Editar título{% else %}Novo título{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h1 class="h3 mb-3">{% if object %}Editar título{% else %}Novo título{% endif %}</h1>
+
+    <form method="post" class="bg-white p-4 border rounded">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-dark">Salvar</button>
+      <a href="{% url 'catalog:title_list' %}" class="btn btn-outline-secondary">Cancelar</a>
+    </form>
+  </div>
+</div>
+{% endblock %}
