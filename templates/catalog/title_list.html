@@ -9,14 +9,14 @@
 
 <form method="get" class="row g-2 mb-4">
   <div class="col-md-6">
-    <input type="text" name="q" class="form-control"
-           placeholder="Buscar título" value="{{ request.GET.q }}">
+    <input type="text" name="search" class="form-control"
+           placeholder="Buscar título" value="{{ request.GET.search }}">
   </div>
   <div class="col-md-4">
-    <select name="kind" class="form-select">
+    <select name="type" class="form-select">
       <option value="">Filmes e séries</option>
-      {% for value, label in kinds %}
-        <option value="{{ value }}" {% if request.GET.kind == value %}selected{% endif %}>
+      {% for value, label in types %}
+        <option value="{{ value }}" {% if request.GET.type == value %}selected{% endif %}>
           {{ label }}
         </option>
       {% endfor %}
@@ -41,7 +41,7 @@
     {% for title in titles %}
     <tr>
       <td>{{ title.name }}</td>
-      <td>{{ title.get_kind_display }}</td>
+      <td>{{ title.get_type_display }}</td>
       <td>{{ title.release_year|default:"-" }}</td>
       <td>
         {% for genre in title.genres.all %}
@@ -65,7 +65,7 @@
     {% if page_obj.has_previous %}
       <li class="page-item">
         <a class="page-link"
-           href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}&kind={{ request.GET.kind }}">Anterior</a>
+           href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.search }}&kind={{ request.GET.type }}">Anterior</a>
       </li>
     {% endif %}
     <li class="page-item disabled">

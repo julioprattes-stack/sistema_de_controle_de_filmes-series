@@ -10,9 +10,12 @@ class OwnEntriesMixin(LoginRequiredMixin):
     """Restringe qualquer view aos registros do usuário logado."""
 
     def get_queryset(self):
-        return WatchEntryModel.objects.filter(user=self.request.user).select_related(
-            "title", "platform"
-        )
+        return WatchEntryModel.objects.filter(user=self.request.user).select_related("title")
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
 
 class WatchEntryListView(OwnEntriesMixin, ListView):
     template_name = "tracking/entry_list.html"

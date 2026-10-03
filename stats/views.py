@@ -28,10 +28,10 @@ class StatsView(LoginRequiredMixin, TemplateView):
         )
 
         # Filmes x séries assistidos
-        kind_labels = dict(TitleModel.Kind.choices)
-        by_kind = done.values("title__kind").annotate(total=Count("id"))
+        kind_labels = dict(TitleModel.Type.choices)
+        by_kind = done.values("title__type").annotate(total=Count("id"))
         kind_data = {
-            "labels": [kind_labels[row["title__kind"]] for row in by_kind],
+            "labels": [kind_labels[row["title__type"]] for row in by_kind],
             "values": [row["total"] for row in by_kind],
         }
 
