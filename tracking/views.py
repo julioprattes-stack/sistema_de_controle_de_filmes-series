@@ -12,10 +12,12 @@ class OwnEntriesMixin(LoginRequiredMixin):
     def get_queryset(self):
         return WatchEntryModel.objects.filter(user=self.request.user).select_related("title")
     
+class UserFormKwargsMixin:
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
         return kwargs
+
 
 class WatchEntryListView(OwnEntriesMixin, ListView):
     template_name = "tracking/entry_list.html"
@@ -31,7 +33,7 @@ class WatchEntryListView(OwnEntriesMixin, ListView):
         if status:
             queryset = queryset.filter(status=status)
         if kind:
-            queryset = queryset.filter(title__kind=kind)
+            queryset = queryset.filter(title__type=kind)
         if genre:
             queryset = queryset.filter(title__genres__id=genre)
         if search:
@@ -45,7 +47,7 @@ class WatchEntryListView(OwnEntriesMixin, ListView):
         context["genres"] = GenusModel.objects.order_by("name")
         return context
     
-class WatchEntryCreateView(OwnEntriesMixin, CreateView):
+class WatchEntryCreateView(UserFormKwargsMixin, OwnEntriesMixin, CreateView):
     model = WatchEntryModel
     form_class = RegisterTrackingForm
     template_name = 'tracking/entry_form.html'
@@ -55,7 +57,7 @@ class WatchEntryCreateView(OwnEntriesMixin, CreateView):
         form.instance.user = self.request.user
         return super().form_valid(form)
 
-class WatchEntryUpdateView(OwnEntriesMixin, UpdateView):
+class WatchEntryUpdateView(UserFormKwargsMixin, OwnEntriesMixin, UpdateView):
     model = WatchEntryModel
     form_class = RegisterTrackingForm
     template_name = 'tracking/entry_form.html'
